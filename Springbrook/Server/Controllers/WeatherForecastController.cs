@@ -18,23 +18,18 @@ namespace Springbrook.Server.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly WeatherService _weatherService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, WeatherService weatherService)
         {
             _logger = logger;
+            _weatherService = weatherService;
         }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return _weatherService.Get();
         }
     }
 }
