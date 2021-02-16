@@ -1,0 +1,159 @@
+﻿@page "/weather"
+@using Springbrook.Shared
+@inject HttpClient Http
+
+<h1>Weather</h1>
+
+<div class="container">
+    <div class="row justify-content-start">
+        <div class="col-1">
+            <strong>
+                State
+            </strong>
+        </div>
+        <div class="col-2">
+
+            @if (states == null)
+            {
+                <p>Loading States...</p>
+            }
+            else
+            {
+                <select name="state" id="state" @onchange=@StateChange>
+                    <option>&nbsp;</option>
+                    @foreach (var state in states)
+                    {
+                        <option value="@state.Abbreviation">@state.Name</option>
+                    }
+                </select>
+            }
+        </div>
+    </div>
+
+    <div class="row justify-content-start">
+        <div class="col-1">
+            <strong>
+                Region
+            </strong>
+        </div>
+        <div class="col-2">
+            @if (selectedState != null && regions == null)
+            {
+                <p>Loading Regions...</p>
+            }
+            else if (regions != null)
+            {
+                <select name="region" id="region" @onchange=@RegionChange>
+                    <option>&nbsp;</option>
+                    @foreach (var region in regions)
+                    {
+                        <option value="@region.ID">@region.Name</option>
+                    }
+                </select>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+@if (selectedRegion != null && forecasts == null)
+{
+    <div class="card m-3">
+        <div class="card-body">
+            <p class="card-text">Loading Forecast...</p>
+        </div>
+    </div>
+}
+else if (forecasts != null)
+{
+    @foreach (var forecast in forecasts)
+    {
+        <div class="card m-3">
+            <div class="card-body">
+                <h4 class="card-title">@forecast.Name</h4>
+                <p class="card-text">@forecast.Description</p>
+            </div>
+        </div>
+    }
+}
+
+@if (error != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> @error
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@code {
+    private WeatherState[] states;
+    private string selectedState;
+    private WeatherRegion[] regions;
+    private string selectedRegion;
+    private WeatherForecast[] forecasts;
+
+    private string error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            error = null;
+            selectedRegion = null;
+            regions = null;
+            forecasts = null;
+
+            states = await Http.GetFromJsonAsync<WeatherState[]>("WeatherState");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    async Task StateChange(ChangeEventArgs args)
+    {
+        try
+        {
+            error = null;
+            selectedRegion = null;
+            regions = null;
+            forecasts = null;
+
+            selectedState = args.Value?.ToString();
+            if (selectedState != null)
+            {
+                regions = await Http.GetFromJsonAsync<WeatherRegion[]>($"WeatherRegion?stateAbbreviation={selectedState}");
+            }
+        }
+        catch (Exception ex)
+        {
+            selectedState = null;
+            error = ex.Message;
+        }
+    }
+
+    async Task RegionChange(ChangeEventArgs args)
+    {
+        try
+        {
+            error = null;
+            forecasts = null;
+
+            selectedRegion = args.Value?.ToString();
+            if (selectedRegion != null)
+            {
+                forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>($"WeatherForecast?id={selectedRegion}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            selectedRegion = null;
+            error = ex.Message;
+        }
+    }
+}
