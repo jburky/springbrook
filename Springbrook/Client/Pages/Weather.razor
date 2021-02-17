@@ -103,7 +103,7 @@ else if (forecasts != null)
             forecasts = null;
 
             selectedState = args.Value?.ToString();
-            if (selectedState != null)
+            if (!selectedState.IsNullOrWhitespace())
             {
                 regions = await Http.GetFromJsonAsync<WeatherRegion[]>($"WeatherRegion?stateAbbreviation={selectedState}");
             }
@@ -124,7 +124,7 @@ else if (forecasts != null)
             forecasts = null;
 
             selectedRegion = args.Value?.ToString();
-            if (selectedRegion != null)
+            if (!selectedRegion.IsNullOrWhitespace())
             {
                 forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>($"WeatherForecast?id={selectedRegion}");
             }

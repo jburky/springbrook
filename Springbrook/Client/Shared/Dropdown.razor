@@ -1,7 +1,7 @@
 ﻿@typeparam TData
 
 <select disabled="@(Data == null)" @onchange=@OnChange>
-    <option>@UnboundText</option>
+    <option value="">@UnboundText</option>
     @if (Data != null)
     {
         @foreach (var item in Data)
