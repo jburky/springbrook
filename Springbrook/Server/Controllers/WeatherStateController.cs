@@ -12,19 +12,19 @@ namespace Springbrook.Server.Controllers
     [Route("[controller]")]
     public class WeatherStateController : ControllerBase
     {
-        private readonly ILogger<WeatherStateController> _logger;
-        private readonly WeatherService _weatherService;
+        private readonly ILogger<WeatherStateController> logger;
+        private readonly WeatherService weatherService;
 
         public WeatherStateController(ILogger<WeatherStateController> logger, WeatherService weatherService)
         {
-            _logger = logger;
-            _weatherService = weatherService;
+            this.logger = logger;
+            this.weatherService = weatherService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<WeatherState>> Get()
+        public async Task<IEnumerable<WeatherState>> GetAsync()
         {
-            return await _weatherService.GetStates();
+            return await weatherService.GetStatesAsync();
         }
     }
 }

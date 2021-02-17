@@ -13,9 +13,9 @@ namespace Springbrook.Shared
     {
         private const string BASE_URL = "https://api.weather.gov";
         private const string CACHE_FILE_STATES = "Cache\\states.json";
-        private IEnumerable<WeatherState> _states;
+        private IEnumerable<WeatherState> states;
 
-        private async Task<IRestResponse> Request(string resource, Method method = Method.GET)
+        private async Task<IRestResponse> RequestAsync(string resource, Method method = Method.GET)
         {
             var client = new RestClient(BASE_URL);
             client.Timeout = 1000 * 60;
@@ -28,13 +28,13 @@ namespace Springbrook.Shared
             return result;
         }
 
-        public async Task<IEnumerable<WeatherState>> GetStates()
+        public async Task<IEnumerable<WeatherState>> GetStatesAsync()
         {
-            if (_states == null)
+            if (states == null)
             {
                 var data = await File.ReadAllTextAsync(CACHE_FILE_STATES);
                 var json = JArray.Parse(data);
-                _states = json.Select(x =>
+                states = json.Select(x =>
                     new WeatherState
                     {
                         Name = x["name"]?.ToString(),
@@ -42,12 +42,12 @@ namespace Springbrook.Shared
                     });
             }
 
-            return _states;
+            return states;
         }
 
-        public async Task<IEnumerable<WeatherRegion>> GetRegions(string stateAbbreviation)
+        public async Task<IEnumerable<WeatherRegion>> GetRegionsAsync(string stateAbbreviation)
         {
-            var response = await Request($"/zones/public?area={stateAbbreviation}", Method.GET);
+            var response = await RequestAsync($"/zones/public?area={stateAbbreviation}", Method.GET);
 
             var json = JObject.Parse(response.Content);
             var props = json.SelectTokens("$..properties");
@@ -61,9 +61,9 @@ namespace Springbrook.Shared
                 .OrderBy(x => x.Name);
         }
 
-        public async Task<IEnumerable<WeatherForecast>> GetForecast(string id)
+        public async Task<IEnumerable<WeatherForecast>> GetForecastAsync(string id)
         {
-            var response = await Request($"/zones/public/{id}/forecast", Method.GET);
+            var response = await RequestAsync($"/zones/public/{id}/forecast", Method.GET);
 
             var json = JObject.Parse(response.Content);
             var periods = (JArray)json.SelectToken("$..periods");
