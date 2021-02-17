@@ -1,0 +1,31 @@
+﻿@typeparam TData
+
+<select disabled="@(Data == null)" @onchange=@OnChange>
+    <option>@UnboundText</option>
+    @if (Data != null)
+    {
+        @foreach (var item in Data)
+        {
+            <option value="@Value(item)">@Text(item)</option>
+        }
+    }
+</select>
+
+
+@code {
+    [Parameter]
+    public string UnboundText { get; set; }
+
+    [Parameter]
+    public IEnumerable<TData> Data { get; set; }
+
+    [Parameter]
+    public Func<TData, object> Text { get; set; }
+
+    [Parameter]
+    public Func<TData, object> Value { get; set; }
+
+    [Parameter]
+    public EventCallback<ChangeEventArgs> OnChange { get; set; }
+}
+

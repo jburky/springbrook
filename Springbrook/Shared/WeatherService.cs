@@ -12,25 +12,27 @@ namespace Springbrook.Shared
     public class WeatherService
     {
         private const string BASE_URL = "https://api.weather.gov";
-        private const string CACHE_FILE = "Cache\\states.json";
+        private const string CACHE_FILE_STATES = "Cache\\states.json";
         private IEnumerable<WeatherState> _states;
 
         private async Task<IRestResponse> Request(string resource, Method method = Method.GET)
         {
             var client = new RestClient(BASE_URL);
-            client.ThrowOnAnyError = true;
             client.Timeout = 1000 * 60;
             client.ReadWriteTimeout = 1000 * 60;
             var request = new RestRequest(resource, method);
             request.RequestFormat = DataFormat.Json;
-            return await client.ExecuteAsync(request);
+            var result = await client.ExecuteAsync(request);
+            if (result.ErrorException != null)
+                throw new Exception("The National Weather Service didn't respond, try again!", result.ErrorException);
+            return result;
         }
 
         public async Task<IEnumerable<WeatherState>> GetStates()
         {
             if (_states == null)
             {
-                var data = await File.ReadAllTextAsync(CACHE_FILE);
+                var data = await File.ReadAllTextAsync(CACHE_FILE_STATES);
                 var json = JArray.Parse(data);
                 _states = json.Select(x =>
                     new WeatherState
