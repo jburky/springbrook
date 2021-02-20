@@ -23,8 +23,6 @@ namespace Springbrook.Shared
             var request = new RestRequest(resource, method);
             request.RequestFormat = DataFormat.Json;
             var result = await client.ExecuteAsync(request);
-            if (result.ErrorException != null)
-                throw new Exception("The National Weather Service didn't respond, try again!", result.ErrorException);
             return result;
         }
 

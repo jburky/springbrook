@@ -42,12 +42,7 @@ else if (forecasts != null)
 {
     @foreach (var forecast in forecasts)
     {
-        <div class="card m-3">
-            <div class="card-body">
-                <h4 class="card-title">@forecast.Name</h4>
-                <p class="card-text">@forecast.Description</p>
-            </div>
-        </div>
+        <WeatherDetail Description="@forecast.Description" Title="@forecast.Name" />
     }
 }
 
